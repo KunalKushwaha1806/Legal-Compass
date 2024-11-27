@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Compass</title>
+    <script src="https://cdn.botpress.cloud/webchat/v2.1/inject.js"></script>
+<script src="https://mediafiles.botpress.cloud/87e894fa-d537-49d5-921f-3b7e204cad4f/webchat/v2.1/config.js"></script><script src="https://cdn.botpress.cloud/webchat/v2.1/inject.js"></script>
+
+    <style>
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+    color: #EDEDED;
+    scroll-behavior: smooth;
+    line-height: 1.6;
+}
+
+/* Header Styling */
+header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #f39c12;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #f39c12;
+}
+
+/* Hero Section */
+.hero {
+    background: url('your-hero-image.jpg') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    padding: 0 20px;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    animation: fadeInUp 1.2s ease-in-out;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: #f39c12;
+    color: #fff;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #e67e22;
+    transform: translateY(-5px);
+}
+
+/* Sections Styling */
+section {
+    padding: 100px 20px;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #1b1b1b;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    margin-bottom: 40px;
+}
+
+section h2 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+section p {
+    font-size: 1.2rem;
+    color: #ccc;
+}
+
+/* Services Section */
+.services ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.services li {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 180px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    transition: transform 0.3s;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.services li:hover {
+    transform: translateY(-10px);
+}
+
+/* Contact Section */
+.contact {
+    padding: 60px 20px;
+}
+
+.contact h2 {
+    color: #fff;
+    margin-bottom: 40px;
+}
+
+.contact form {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.contact form label {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.contact form input,
+.contact form textarea {
+    width: 100%;
+    padding: 15px;
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: #fff;
+    transition: border 0.3s ease;
+}
+
+.contact form input:focus,
+.contact form textarea:focus {
+    border-color: #f39c12;
+}
+
+.contact form button {
+    width: 100%;
+    padding: 15px;
+    background-color: #f39c12;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.contact form button:hover {
+    background-color: #e67e22;
+    transform: translateY(-5px);
+}
+
+/* Responsive Layout */
+@media (min-width: 768px) {
+    .contact form .half {
+        width: 48%;
+    }
+
+    .contact form .full {
+        width: 100%;
+    }
+}
+
+/* Footer Styling */
+footer {
+    background-color: #1b1b1b;
+    text-align: center;
+    padding: 20px;
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: #f39c12;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #e67e22;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Legal Compass</div>
+            <ul class="nav-links">
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#services">Services</a></li>
+
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div>
+            <h1>Your Trusted Legal Guide</h1>
+            <p>AI-powered legal advice to navigate your challenges with confidence.</p>
+            <a href="https://cdn.botpress.cloud/webchat/v2/shareable.html?botId=87e894fa-d537-49d5-921f-3b7e204cad4f" class="cta-button">Chat with Virtual Assistant</a>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2>About Us</h2>
+        <p>At Legal Compass, we’re making legal advice easy and accessible for everyone. Our virtual assistant is designed to help you find answers to everyday legal questions quickly and easily. Whether you need guidance on legal rights, documents, or processes, we’ve got you covered.
+
+            We believe everyone should have access to clear, simple legal help without the stress. No complicated terms, just straightforward answers to your questions — anytime, anywhere.
+            
+            </p>
+    </section>
+
+    <section id="services" class="services">
+        <h2>Our Services</h2>
+        <ul>
+            <li><a href="https://drive.google.com/drive/folders/1RFtrmzI8234BSZVsldkiOJt3evTL0Ynk?usp=drive_link" class="service-button">Corporate Law</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1Am1lGque4cj9ONRrgm7fNl7bok3rEfw8?usp=drive_link" class="service-button">Family Law</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1eHd5eyknINztrHxyElia6L7eeEpsnjdm?usp=drive_link" class="service-button">Criminal Defense</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1xdKNXgjQnhtNSqhf824Ixl9OxzjpAJxh?usp=drive_link" class="service-button">Real Estate Law</a></li>
+            <li><a href="https://drive.google.com/drive/folders/1rFgFk3s4WYO9QJZO6f9CTBglSXzOTax3?usp=drive_link" class="service-button">IPC Section</a></li>
+        </ul>
+    </section>
+    
+
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+        <form>
+            <div class="half">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="half">
+                <label for="email">Your Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="full">
+                <label for="message">Your Message</label>
+                <textarea id="message" name="message" rows="6" required></textarea>
+            </div>
+            <div class="full">
+                <button type="submit">Send Message</button>
+            </div>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Legal Compass. All Rights Reserved. | <a href="#contact">Get in Touch</a></p>
+    </footer><script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+   
+
+  
+</body>
+</html>
