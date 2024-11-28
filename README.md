@@ -76,9 +76,6 @@ LegalCompass bridges the gap between complex legal terminology and the general p
 - **Alekh Sachan**  
 - **Roshni Samanta**  
 
-### **Supervisor**  
-**Mr. Rajendra Kumar** - Associate Professor  
-
 ---
 
 ## 📖 **References**
