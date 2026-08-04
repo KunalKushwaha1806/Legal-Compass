@@ -3,332 +3,1395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legal Compass</title>
-    <script src="https://cdn.botpress.cloud/webchat/v2.1/inject.js"></script>
-<script src="https://mediafiles.botpress.cloud/87e894fa-d537-49d5-921f-3b7e204cad4f/webchat/v2.1/config.js"></script><script src="https://cdn.botpress.cloud/webchat/v2.1/inject.js"></script>
+    <meta name="description" content="Legal Compass — AI-powered legal assistant for Indian citizens. Get instant answers on Constitutional rights, IPC, CrPC, contracts, property law and more.">
+    <meta name="keywords" content="Indian law, legal assistant, IPC, CrPC, Constitution, Article 21, FIR, bail, legal advice India">
+    <title>Legal Compass — AI-Powered Legal Assistant for India</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Marked.js for markdown rendering in chat -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
-/* CSS START */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        /* ═══════════════════════════════════════════════════
+           DESIGN TOKENS
+        ═══════════════════════════════════════════════════ */
+        :root {
+            --bg:           #020617;
+            --bg-card:      rgba(15, 23, 42, 0.80);
+            --bg-card-2:    rgba(30, 41, 59, 0.60);
+            --border:       rgba(99, 102, 241, 0.15);
+            --border-gold:  rgba(245, 158, 11, 0.20);
+            --indigo:       #6366f1;
+            --indigo-dark:  #4f46e5;
+            --indigo-light: #818cf8;
+            --indigo-glow:  rgba(99, 102, 241, 0.30);
+            --gold:         #f59e0b;
+            --gold-light:   #fcd34d;
+            --gold-glow:    rgba(245, 158, 11, 0.25);
+            --green:        #10b981;
+            --red:          #ef4444;
+            --text:         #f1f5f9;
+            --text-muted:   #94a3b8;
+            --text-faint:   #475569;
+            --radius:       16px;
+            --radius-sm:    8px;
+            --shadow-lg:    0 25px 60px rgba(0, 0, 0, 0.6);
+            --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: #EDEDED;
-    scroll-behavior: smooth;
-    line-height: 1.6;
-}
+        /* ═══════════════════════════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Outfit', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--indigo); border-radius: 3px; }
+        a { text-decoration: none; color: inherit; }
 
-/* Header Styling */
-header {
-    position: fixed;
-    width: 100%;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.85);
-    padding: 10px 0;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
+        /* ═══════════════════════════════════════════════════
+           ANIMATED BACKGROUND ORBS
+        ═══════════════════════════════════════════════════ */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+            animation: orb-float 10s ease-in-out infinite;
+        }
+        .orb-1 { width: 600px; height: 600px; background: var(--indigo); top: -15%; left: -12%; }
+        .orb-2 { width: 450px; height: 450px; background: var(--gold);   top: 40%; right: -8%; animation-delay: -4s; }
+        .orb-3 { width: 350px; height: 350px; background: #7c3aed;       bottom: 5%; left: 25%; animation-delay: -7s; }
 
-nav {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        @keyframes orb-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%       { transform: translate(25px, -25px) scale(1.06); }
+            66%       { transform: translate(-18px, 18px) scale(0.94); }
+        }
 
-.logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #f39c12;
-}
+        /* ═══════════════════════════════════════════════════
+           NAVIGATION
+        ═══════════════════════════════════════════════════ */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 18px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(2, 6, 23, 0.65);
+            backdrop-filter: blur(24px) saturate(1.5);
+            -webkit-backdrop-filter: blur(24px) saturate(1.5);
+            border-bottom: 1px solid var(--border);
+            transition: padding 0.3s var(--ease), background 0.3s var(--ease);
+        }
+        .navbar.scrolled {
+            padding: 12px 48px;
+            background: rgba(2, 6, 23, 0.95);
+        }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-}
+        .nav-logo {
+            display: flex; align-items: center; gap: 11px;
+            font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px;
+        }
+        .nav-logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--indigo), var(--gold));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 22px var(--indigo-glow);
+        }
+        .nav-logo span { color: var(--gold); }
 
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.1rem;
-    transition: color 0.3s;
-}
+        .nav-links {
+            list-style: none;
+            display: flex; align-items: center; gap: 30px;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            font-size: 0.92rem; font-weight: 500;
+            position: relative;
+            transition: color 0.25s;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute; bottom: -4px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--indigo), var(--gold));
+            border-radius: 1px;
+            transform: scaleX(0);
+            transition: transform 0.3s var(--ease);
+        }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a:hover::after { transform: scaleX(1); }
 
-.nav-links a:hover {
-    color: #f39c12;
-}
+        .nav-cta {
+            background: linear-gradient(135deg, var(--indigo), var(--indigo-dark));
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600; font-size: 0.88rem;
+            box-shadow: 0 0 20px var(--indigo-glow);
+            transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+        }
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 32px var(--indigo-glow);
+        }
+        .nav-cta::after { display: none !important; }
 
-/* Hero Section */
-.hero {
-    background: url('your-hero-image.jpg') no-repeat center center/cover;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #fff;
-    padding: 0 20px;
-}
+        /* ═══════════════════════════════════════════════════
+           HERO
+        ═══════════════════════════════════════════════════ */
+        .hero {
+            position: relative; z-index: 1;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 130px 40px 90px;
+            overflow: hidden;
+        }
 
-.hero h1 {
-    font-size: 3.5rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 20px;
-    animation: fadeInUp 1s ease-in-out;
-}
+        /* Floating decorative icons */
+        .hero-float {
+            position: absolute;
+            font-size: 2.8rem;
+            opacity: 0.06;
+            pointer-events: none;
+            animation: float-anim 7s ease-in-out infinite;
+        }
+        .hero-float:nth-child(1) { top: 18%; left: 7%;  animation-delay: 0s; }
+        .hero-float:nth-child(2) { top: 25%; right: 7%; animation-delay: -2.5s; }
+        .hero-float:nth-child(3) { bottom: 18%; left: 10%; animation-delay: -5s; }
+        .hero-float:nth-child(4) { bottom: 22%; right: 10%; animation-delay: -1.5s; }
+        @keyframes float-anim {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-22px) rotate(6deg); }
+        }
 
-.hero p {
-    font-size: 1.5rem;
-    margin-bottom: 40px;
-    animation: fadeInUp 1.2s ease-in-out;
-}
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.28);
+            color: var(--indigo-light);
+            padding: 7px 18px;
+            border-radius: 50px;
+            font-size: 0.82rem; font-weight: 600;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.7s var(--ease) both;
+        }
+        .badge-dot {
+            width: 6px; height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
+        }
 
-.cta-button {
-    display: inline-block;
-    background-color: #f39c12;
-    color: #fff;
-    padding: 15px 40px;
-    font-size: 1.2rem;
-    border-radius: 30px;
-    text-decoration: none;
-    transition: background-color 0.3s, transform 0.3s;
-}
+        .hero-title {
+            font-size: clamp(2.8rem, 7vw, 5.8rem);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -2.5px;
+            margin-bottom: 26px;
+            animation: fadeInUp 0.75s var(--ease) 0.1s both;
+        }
+        .gradient-text {
+            background: linear-gradient(130deg, var(--indigo-light) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-.cta-button:hover {
-    background-color: #e67e22;
-    transform: translateY(-5px);
-}
+        .hero-sub {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto 44px;
+            font-weight: 400;
+            animation: fadeInUp 0.75s var(--ease) 0.2s both;
+        }
 
-/* Sections Styling */
-section {
-    padding: 100px 20px;
-    text-align: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: #1b1b1b;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    margin-bottom: 40px;
-}
+        .hero-btns {
+            display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+            animation: fadeInUp 0.75s var(--ease) 0.3s both;
+        }
 
-section h2 {
-    font-size: 2.5rem;
-    color: #fff;
-    margin-bottom: 20px;
-}
+        /* Shared button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--indigo), var(--indigo-dark));
+            color: white; border: none; border-radius: 50px;
+            padding: 14px 34px; font-size: 1rem; font-weight: 700;
+            font-family: inherit; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 9px;
+            box-shadow: 0 0 30px var(--indigo-glow);
+            transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 45px var(--indigo-glow);
+        }
+        .btn-outline {
+            background: transparent; color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 50px; padding: 14px 34px;
+            font-size: 1rem; font-weight: 600; font-family: inherit; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 9px;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s var(--ease);
+        }
+        .btn-outline:hover {
+            border-color: var(--indigo);
+            background: rgba(99, 102, 241, 0.10);
+            transform: translateY(-3px);
+        }
 
-section p {
-    font-size: 1.2rem;
-    color: #ccc;
-}
+        .hero-stats {
+            display: flex; gap: 52px; margin-top: 70px;
+            animation: fadeInUp 0.75s var(--ease) 0.4s both;
+            flex-wrap: wrap; justify-content: center;
+        }
+        .stat-num {
+            font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--text), var(--gold-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-lbl {
+            font-size: 0.75rem; color: var(--text-faint);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+            margin-top: 4px;
+        }
 
-/* Services Section */
-.services ul {
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 0;
-    margin-top: 40px;
-    flex-wrap: wrap;
-}
+        /* ═══════════════════════════════════════════════════
+           SECTION COMMONS
+        ═══════════════════════════════════════════════════ */
+        .section {
+            position: relative; z-index: 1;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 100px 40px;
+        }
+        .section-label {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+            padding: 6px 16px; border-radius: 50px;
+            font-size: 0.78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: clamp(1.9rem, 4vw, 2.9rem);
+            font-weight: 800; line-height: 1.15; letter-spacing: -1px;
+            margin-bottom: 14px;
+        }
+        .section-sub {
+            font-size: 1.05rem; color: var(--text-muted);
+            max-width: 580px; margin-bottom: 56px;
+        }
+        .center { text-align: center; }
+        .center .section-sub { margin-left: auto; margin-right: auto; }
+        .center .section-label { justify-content: center; display: inline-flex; }
 
-.services li {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 180px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    color: #fff;
-    transition: transform 0.3s;
-    text-align: center;
-    margin-bottom: 20px;
-}
+        /* Reveal animation */
+        .reveal {
+            opacity: 0; transform: translateY(28px);
+            transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.12s; }
+        .reveal-delay-2 { transition-delay: 0.24s; }
+        .reveal-delay-3 { transition-delay: 0.36s; }
 
-.services li:hover {
-    transform: translateY(-10px);
-}
+        /* ═══════════════════════════════════════════════════
+           FEATURES GRID
+        ═══════════════════════════════════════════════════ */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 22px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            backdrop-filter: blur(20px);
+            position: relative; overflow: hidden;
+            transition: transform 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--indigo), var(--gold));
+            transform: scaleX(0); transform-origin: left;
+            transition: transform 0.4s var(--ease);
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(99, 102, 241, 0.35);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.35), 0 0 35px var(--indigo-glow);
+        }
+        .feature-card:hover::before { transform: scaleX(1); }
 
-/* Contact Section */
-.contact {
-    padding: 60px 20px;
-}
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 20px;
+        }
+        .fi-indigo { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.22); }
+        .fi-gold   { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.22); }
+        .fi-green  { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.22); }
 
-.contact h2 {
-    color: #fff;
-    margin-bottom: 40px;
-}
+        .feature-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+        .feature-desc  { color: var(--text-muted); font-size: 0.92rem; line-height: 1.75; }
 
-.contact form {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
+        /* ═══════════════════════════════════════════════════
+           SERVICES GRID
+        ═══════════════════════════════════════════════════ */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+            gap: 18px;
+        }
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 18px; text-align: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s var(--ease);
+        }
+        .service-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.35), 0 0 22px var(--gold-glow);
+            background: rgba(245, 158, 11, 0.04);
+        }
+        .service-emoji { font-size: 2.6rem; display: block; margin-bottom: 14px; }
+        .service-name  { font-size: 0.98rem; font-weight: 700; margin-bottom: 6px; }
+        .service-desc  { font-size: 0.78rem; color: var(--text-faint); }
 
-.contact form label {
-    color: #fff;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-}
+        /* ═══════════════════════════════════════════════════
+           CHAT INTERFACE
+        ═══════════════════════════════════════════════════ */
+        #chat { position: relative; z-index: 1; padding: 100px 40px; }
+        .chat-outer { max-width: 880px; margin: 0 auto; }
 
-.contact form input,
-.contact form textarea {
-    width: 100%;
-    padding: 15px;
-    background-color: #333;
-    border: 1px solid #555;
-    border-radius: 5px;
-    color: #fff;
-    transition: border 0.3s ease;
-}
+        .chat-box {
+            background: rgba(10, 18, 36, 0.88);
+            border: 1px solid var(--border);
+            border-radius: 22px; overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(30px);
+        }
 
-.contact form input:focus,
-.contact form textarea:focus {
-    border-color: #f39c12;
-}
+        /* Header */
+        .chat-head {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 18px 26px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .chat-head-info { display: flex; align-items: center; gap: 13px; }
+        .chat-avatar {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, var(--indigo), var(--gold));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+        .chat-name   { font-weight: 700; font-size: 0.98rem; }
+        .chat-status { font-size: 0.78rem; color: var(--green); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+        .status-dot  { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse-dot 2s infinite; }
 
-.contact form button {
-    width: 100%;
-    padding: 15px;
-    background-color: #f39c12;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-}
+        .chat-head-actions { display: flex; gap: 9px; }
+        .chat-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 7px 14px;
+            color: var(--text-muted); font-size: 0.78rem;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s var(--ease);
+        }
+        .chat-btn:hover { background: rgba(255,255,255,0.10); color: var(--text); border-color: var(--indigo); }
 
-.contact form button:hover {
-    background-color: #e67e22;
-    transform: translateY(-5px);
-}
+        /* Suggestions */
+        .chat-suggestions {
+            padding: 14px 26px;
+            border-bottom: 1px solid rgba(99,102,241,0.07);
+            display: flex; gap: 9px; flex-wrap: wrap;
+        }
+        .chip {
+            background: rgba(99,102,241,0.07);
+            border: 1px solid rgba(99,102,241,0.20);
+            color: var(--indigo-light);
+            padding: 6px 13px; border-radius: 50px;
+            font-size: 0.78rem; font-weight: 500; cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s var(--ease);
+        }
+        .chip:hover { background: rgba(99,102,241,0.15); border-color: var(--indigo); }
 
-/* Responsive Layout */
-@media (min-width: 768px) {
-    .contact form .half {
-        width: 48%;
-    }
+        /* Messages */
+        .chat-msgs {
+            height: 440px; overflow-y: auto;
+            padding: 22px 26px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .chat-msgs::-webkit-scrollbar { width: 4px; }
+        .chat-msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    .contact form .full {
-        width: 100%;
-    }
-}
+        .msg { display: flex; gap: 11px; animation: msg-in 0.3s var(--ease); }
+        .msg.user { flex-direction: row-reverse; }
+        @keyframes msg-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-/* Footer Styling */
-footer {
-    background-color: #1b1b1b;
-    text-align: center;
-    padding: 20px;
-    color: #ccc;
-    font-size: 0.9rem;
-}
+        .msg-av {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 1rem;
+        }
+        .msg.bot .msg-av  { background: linear-gradient(135deg, var(--indigo), var(--gold)); }
+        .msg.user .msg-av { background: rgba(99,102,241,0.18); border: 1px solid rgba(99,102,241,0.28); }
 
-footer a {
-    color: #f39c12;
-    text-decoration: none;
-}
+        .msg-body { max-width: 76%; }
+        .msg-bubble {
+            padding: 13px 17px; border-radius: 14px;
+            font-size: 0.92rem; line-height: 1.75;
+        }
+        .msg.bot  .msg-bubble {
+            background: rgba(30,41,59,0.85);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+        .msg.user .msg-bubble {
+            background: linear-gradient(135deg, var(--indigo), var(--indigo-dark));
+            border-bottom-right-radius: 4px; color: #fff;
+        }
 
-footer a:hover {
-    color: #e67e22;
-}
+        /* Markdown in bot bubbles */
+        .msg.bot .msg-bubble strong  { color: var(--gold-light); }
+        .msg.bot .msg-bubble em      { color: var(--text-muted); font-size: 0.87em; }
+        .msg.bot .msg-bubble ul,
+        .msg.bot .msg-bubble ol      { padding-left: 1.2em; margin: 6px 0; }
+        .msg.bot .msg-bubble li      { margin-bottom: 3px; }
+        .msg.bot .msg-bubble p       { margin-bottom: 6px; }
+        .msg.bot .msg-bubble p:last-child { margin-bottom: 0; }
+        .msg.bot .msg-bubble code    {
+            background: rgba(99,102,241,0.12);
+            color: var(--indigo-light);
+            padding: 1px 6px; border-radius: 4px;
+            font-family: monospace; font-size: 0.87em;
+        }
 
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* Meta row */
+        .msg-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+        .cat-badge {
+            font-size: 0.7rem; padding: 2px 9px; border-radius: 50px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .cat-constitution { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+        .cat-ipc          { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+        .cat-crpc         { background: rgba(99,102,241,0.12); color: var(--indigo-light); border: 1px solid rgba(99,102,241,0.2); }
+        .cat-general      { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid var(--border-gold); }
+        .msg-src          { font-size: 0.7rem; color: var(--text-faint); }
+        .msg-time         { font-size: 0.7rem; color: var(--text-faint); }
+
+        /* Typing indicator */
+        .typing-wrap { display: flex; gap: 11px; }
+        .typing-bubble {
+            padding: 13px 18px;
+            background: rgba(30,41,59,0.85);
+            border: 1px solid var(--border);
+            border-radius: 14px; border-bottom-left-radius: 4px;
+            display: flex; gap: 5px; align-items: center;
+        }
+        .typing-dot {
+            width: 8px; height: 8px; background: var(--indigo-light); border-radius: 50%;
+            animation: type-bounce 1.3s ease-in-out infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.18s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.36s; }
+        @keyframes type-bounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+            30%           { transform: translateY(-8px); opacity: 1; }
+        }
+
+        /* Offline banner */
+        .api-banner {
+            display: none; padding: 11px 26px;
+            background: rgba(239,68,68,0.07);
+            border-top: 1px solid rgba(239,68,68,0.15);
+            font-size: 0.8rem; color: #f87171;
+            align-items: center; gap: 9px;
+        }
+        .api-banner.show { display: flex; }
+        .api-banner a { color: var(--gold); text-decoration: underline; }
+
+        /* Input */
+        .chat-input-wrap { padding: 18px 26px; border-top: 1px solid var(--border); background: rgba(15,23,42,0.5); }
+        .chat-input-row  { display: flex; gap: 11px; align-items: flex-end; }
+        .chat-input {
+            flex: 1;
+            background: rgba(30,41,59,0.55);
+            border: 1px solid var(--border); border-radius: 13px;
+            padding: 13px 17px; color: var(--text);
+            font-family: inherit; font-size: 0.92rem;
+            resize: none; max-height: 120px; outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .chat-input::placeholder { color: var(--text-faint); }
+        .chat-input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-glow); }
+        .chat-send {
+            width: 50px; height: 50px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--indigo), var(--indigo-dark));
+            border: none; border-radius: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 22px var(--indigo-glow);
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+        }
+        .chat-send:hover:not(:disabled) { transform: scale(1.07); box-shadow: 0 0 32px var(--indigo-glow); }
+        .chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
+        .chat-hint { margin-top: 9px; font-size: 0.73rem; color: var(--text-faint); }
+
+        /* ═══════════════════════════════════════════════════
+           HOW IT WORKS
+        ═══════════════════════════════════════════════════ */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 28px;
+        }
+        .step-card { text-align: center; }
+        .step-num {
+            width: 66px; height: 66px;
+            background: linear-gradient(135deg, var(--indigo), var(--gold));
+            border-radius: 50%; margin: 0 auto 22px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; font-weight: 900;
+            box-shadow: 0 0 30px var(--indigo-glow);
+        }
+        .step-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 9px; }
+        .step-desc  { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* ═══════════════════════════════════════════════════
+           TEAM
+        ═══════════════════════════════════════════════════ */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+        }
+        .team-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 30px 22px; text-align: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s var(--ease);
+        }
+        .team-card:hover {
+            border-color: rgba(99,102,241,0.30);
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.30);
+        }
+        .team-av {
+            width: 78px; height: 78px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--indigo), var(--gold));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 16px;
+            border: 3px solid rgba(99,102,241,0.25);
+        }
+        .team-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+        .team-role { font-size: 0.82rem; color: var(--gold); font-weight: 600; margin-bottom: 11px; }
+        .team-bio  { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* ═══════════════════════════════════════════════════
+           CONTACT
+        ═══════════════════════════════════════════════════ */
+        .contact-grid {
+            display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px; align-items: start;
+        }
+        .contact-item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 26px; }
+        .contact-icon {
+            width: 44px; height: 44px; flex-shrink: 0;
+            background: rgba(99,102,241,0.09); border: 1px solid rgba(99,102,241,0.20);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        }
+        .contact-lbl   { font-size: 0.78rem; color: var(--text-faint); margin-bottom: 2px; }
+        .contact-val   { font-weight: 600; font-size: 0.95rem; }
+        .contact-legal { font-size: 0.82rem; color: var(--text-muted); font-weight: 400; line-height: 1.6; }
+
+        .contact-form {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 34px; backdrop-filter: blur(20px);
+        }
+        .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 18px; }
+        .form-lbl {
+            display: block; font-size: 0.78rem; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 7px;
+        }
+        .form-input, .form-ta {
+            width: 100%; background: rgba(30,41,59,0.50);
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 11px 15px; color: var(--text); font-family: inherit; font-size: 0.92rem; outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .form-ta { resize: vertical; min-height: 115px; }
+        .form-input:focus, .form-ta:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-glow); }
+        .form-input::placeholder, .form-ta::placeholder { color: var(--text-faint); }
+        .btn-submit {
+            width: 100%; background: linear-gradient(135deg, var(--indigo), var(--indigo-dark));
+            color: white; border: none; border-radius: 10px;
+            padding: 13px; font-size: 0.97rem; font-weight: 700; font-family: inherit; cursor: pointer;
+            box-shadow: 0 0 20px var(--indigo-glow);
+            transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 0 32px var(--indigo-glow); }
+
+        /* ═══════════════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════════════ */
+        footer {
+            position: relative; z-index: 1;
+            background: rgba(2,6,23,0.97);
+            border-top: 1px solid var(--border);
+            padding: 58px 48px 28px;
+        }
+        .footer-inner { max-width: 1180px; margin: 0 auto; }
+        .footer-top {
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 44px;
+            padding-bottom: 38px; border-bottom: 1px solid var(--border); margin-bottom: 26px;
+        }
+        .footer-logo { font-size: 1.3rem; font-weight: 800; display: block; margin-bottom: 12px; }
+        .footer-logo span { color: var(--gold); }
+        .footer-brand p { color: var(--text-muted); font-size: 0.88rem; max-width: 270px; }
+        .footer-col h4 {
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 14px;
+        }
+        .footer-col a {
+            display: block; color: var(--text-faint); font-size: 0.88rem;
+            margin-bottom: 10px; transition: color 0.2s;
+        }
+        .footer-col a:hover { color: var(--text); }
+        .footer-bot {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-copy       { color: var(--text-faint); font-size: 0.82rem; }
+        .footer-disclaimer { color: var(--text-faint); font-size: 0.73rem; max-width: 420px; text-align: right; }
+
+        /* ═══════════════════════════════════════════════════
+           KEYFRAME ANIMATIONS
+        ═══════════════════════════════════════════════════ */
+        @keyframes fadeInUp   { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════════════ */
+        @media (max-width: 960px) {
+            .navbar { padding: 14px 22px; }
+            .nav-links { display: none; }
+            .section { padding: 65px 22px; }
+            #chat { padding: 65px 22px; }
+            .hero { padding: 110px 22px 65px; }
+            .hero-stats { gap: 26px; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+            .form-2col { grid-template-columns: 1fr; }
+            .chat-msgs { height: 360px; }
+        }
+        @media (max-width: 600px) {
+            .hero-title { font-size: 2.6rem; letter-spacing: -1.5px; }
+            .footer-top { grid-template-columns: 1fr; }
+            .footer-bot { flex-direction: column; gap: 12px; text-align: center; }
+            .footer-disclaimer { text-align: center; }
+            .hero-stats { gap: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <nav>
-            <div class="logo">Legal Compass</div>
-            <ul class="nav-links">
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#services">Services</a></li>
+    <!-- ── Animated Background ─────────────────────────────── -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- ══════════════════════════════════════════════════════
+         NAVIGATION
+    ══════════════════════════════════════════════════════ -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">⚖️</div>
+            Legal<span>Compass</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#chat">AI Chat</a></li>
+            <li><a href="#team">Team</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <a href="#chat" class="nav-cta">Ask a Legal Question →</a>
+    </nav>
 
-    <section class="hero">
-        <div>
-            <h1>Your Trusted Legal Guide</h1>
-            <p>AI-powered legal advice to navigate your challenges with confidence.</p>
-            <a href="https://cdn.botpress.cloud/webchat/v2/shareable.html?botId=87e894fa-d537-49d5-921f-3b7e204cad4f" class="cta-button">Chat with Virtual Assistant</a>
+    <!-- ══════════════════════════════════════════════════════
+         HERO
+    ══════════════════════════════════════════════════════ -->
+    <section class="hero" id="home">
+        <div class="hero-float">⚖️</div>
+        <div class="hero-float">📜</div>
+        <div class="hero-float">🏛️</div>
+        <div class="hero-float">🔏</div>
+
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            AI-Powered · Indian Law · NLP Driven
+        </div>
+
+        <h1 class="hero-title">
+            Your Trusted<br>
+            <span class="gradient-text">Legal Guide</span>
+        </h1>
+
+        <p class="hero-sub">
+            AI-powered legal assistance for Indian citizens — Constitutional rights, IPC, CrPC, contracts, and more. Clear answers, zero jargon.
+        </p>
+
+        <div class="hero-btns">
+            <a href="#chat" class="btn-primary">💬 Ask a Legal Question</a>
+            <a href="#services" class="btn-outline">📚 Explore Services</a>
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat"><div class="stat-num">40+</div><div class="stat-lbl">Legal Topics</div></div>
+            <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Law Domains</div></div>
+            <div class="stat"><div class="stat-num">24/7</div><div class="stat-lbl">Available</div></div>
+            <div class="stat"><div class="stat-num">Free</div><div class="stat-lbl">Basic Access</div></div>
         </div>
     </section>
 
-    <section id="about" class="about">
-        <h2>About Us</h2>
-        <p>At Legal Compass, we’re making legal advice easy and accessible for everyone. Our virtual assistant is designed to help you find answers to everyday legal questions quickly and easily. Whether you need guidance on legal rights, documents, or processes, we’ve got you covered.
+    <!-- ══════════════════════════════════════════════════════
+         ABOUT / FEATURES
+    ══════════════════════════════════════════════════════ -->
+    <div id="about">
+        <div class="section">
+            <div class="reveal">
+                <div class="section-label">✦ About Legal Compass</div>
+                <h2 class="section-title">Why Legal Compass?</h2>
+                <p class="section-sub">We believe every Indian citizen deserves access to clear, affordable legal information — without complicated jargon or expensive consultations.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card reveal reveal-delay-1">
+                    <div class="feature-icon fi-indigo">🤖</div>
+                    <h3 class="feature-title">NLP-Powered Engine</h3>
+                    <p class="feature-desc">Trained on Indian legal corpus — Constitution, IPC, CrPC — our AI delivers context-aware answers powered by TF-IDF retrieval and a fine-tuned Flan-T5 model.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-2">
+                    <div class="feature-icon fi-gold">⚡</div>
+                    <h3 class="feature-title">Instant Responses</h3>
+                    <p class="feature-desc">Get immediate answers to legal questions anytime, anywhere. Our query-response pipeline processes your question in milliseconds, backed by a Flask REST API.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon fi-green">🛡️</div>
+                    <h3 class="feature-title">Secure & Persistent</h3>
+                    <p class="feature-desc">All conversations are stored locally using SQLite. Your session history is private — no third-party data sharing, no tracking, no cloud dependency.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            We believe everyone should have access to clear, simple legal help without the stress. No complicated terms, just straightforward answers to your questions — anytime, anywhere.
-            
-            </p>
+    <!-- ══════════════════════════════════════════════════════
+         SERVICES
+    ══════════════════════════════════════════════════════ -->
+    <div id="services">
+        <div class="section">
+            <div class="reveal center">
+                <div class="section-label">✦ Our Services</div>
+                <h2 class="section-title">Legal Domains We Cover</h2>
+                <p class="section-sub">From constitutional rights to criminal law — comprehensive coverage of Indian legal frameworks.</p>
+            </div>
+            <div class="services-grid reveal">
+                <a href="https://drive.google.com/drive/folders/1RFtrmzI8234BSZVsldkiOJt3evTL0Ynk?usp=drive_link" class="service-card" target="_blank" id="svc-corporate">
+                    <span class="service-emoji">🏛️</span>
+                    <div class="service-name">Constitutional Law</div>
+                    <div class="service-desc">Fundamental Rights, DPSPs, Amendments</div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1Am1lGque4cj9ONRrgm7fNl7bok3rEfw8?usp=drive_link" class="service-card" target="_blank" id="svc-family">
+                    <span class="service-emoji">👨‍👩‍👧</span>
+                    <div class="service-name">Family Law</div>
+                    <div class="service-desc">Marriage, Divorce, Inheritance, Custody</div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1eHd5eyknINztrHxyElia6L7eeEpsnjdm?usp=drive_link" class="service-card" target="_blank" id="svc-criminal">
+                    <span class="service-emoji">⚔️</span>
+                    <div class="service-name">Criminal Defense</div>
+                    <div class="service-desc">IPC, FIR, Bail, Arrest Rights, CrPC</div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1xdKNXgjQnhtNSqhf824Ixl9OxzjpAJxh?usp=drive_link" class="service-card" target="_blank" id="svc-realestate">
+                    <span class="service-emoji">🏠</span>
+                    <div class="service-name">Real Estate Law</div>
+                    <div class="service-desc">Property, Rent, Tenancy, RERA</div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1rFgFk3s4WYO9QJZO6f9CTBglSXzOTax3?usp=drive_link" class="service-card" target="_blank" id="svc-ipc">
+                    <span class="service-emoji">📖</span>
+                    <div class="service-name">IPC Sections</div>
+                    <div class="service-desc">All Major Penal Code Sections</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         AI CHAT INTERFACE
+    ══════════════════════════════════════════════════════ -->
+    <section id="chat">
+        <div class="chat-outer">
+            <div class="reveal center" style="margin-bottom:46px;">
+                <div class="section-label">✦ AI Legal Assistant</div>
+                <h2 class="section-title" style="margin-top:16px;">Ask Your Legal Question</h2>
+                <p class="section-sub" style="margin:0 auto;">Powered by our NLP pipeline trained on Indian legal data. Be specific for best results.</p>
+            </div>
+
+            <div class="chat-box reveal">
+                <!-- Header -->
+                <div class="chat-head">
+                    <div class="chat-head-info">
+                        <div class="chat-avatar">⚖️</div>
+                        <div>
+                            <div class="chat-name">Legal Compass AI</div>
+                            <div class="chat-status"><span class="status-dot"></span>Online · NLP Powered</div>
+                        </div>
+                    </div>
+                    <div class="chat-head-actions">
+                        <button class="chat-btn" onclick="clearChat()" id="btn-clear">🗑 Clear</button>
+                        <button class="chat-btn" onclick="exportChat()">💾 Export</button>
+                    </div>
+                </div>
+
+                <!-- Quick Suggestions -->
+                <div class="chat-suggestions" id="suggestions-row">
+                    <button class="chip" onclick="useSuggestion(this)">What is Article 21?</button>
+                    <button class="chip" onclick="useSuggestion(this)">How do I file an FIR?</button>
+                    <button class="chip" onclick="useSuggestion(this)">What is anticipatory bail?</button>
+                    <button class="chip" onclick="useSuggestion(this)">Punishment for murder (IPC 302)</button>
+                    <button class="chip" onclick="useSuggestion(this)">What is Section 498A?</button>
+                    <button class="chip" onclick="useSuggestion(this)">What are tenant rights?</button>
+                </div>
+
+                <!-- Messages -->
+                <div class="chat-msgs" id="chat-msgs">
+                    <div class="msg bot" id="welcome-msg">
+                        <div class="msg-av">⚖️</div>
+                        <div class="msg-body">
+                            <div class="msg-bubble">
+                                <strong>Welcome to Legal Compass AI! 👋</strong><br><br>
+                                I'm your AI-powered legal assistant trained on Indian law. I can help you understand:
+                                <ul>
+                                    <li><strong>Constitutional Rights</strong> — Articles 14, 19, 21, 32…</li>
+                                    <li><strong>IPC Sections</strong> — Murder, theft, rape, fraud, dowry cruelty…</li>
+                                    <li><strong>CrPC</strong> — FIR, bail, arrest, custody, anticipatory bail…</li>
+                                    <li><strong>General Law</strong> — Contracts, property, consumer rights, employment…</li>
+                                </ul>
+                                <br>Ask me anything in plain language! ⬇️
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API offline banner -->
+                <div class="api-banner" id="api-banner">
+                    ⚠️ Flask server offline. Start it: <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;">python app.py</code> — or use
+                    <a href="https://cdn.botpress.cloud/webchat/v2/shareable.html?botId=26a83f89-ace1-4045-92ba-95b836f75669" target="_blank">Botpress Chat ↗</a>
+                </div>
+
+                <!-- Input -->
+                <div class="chat-input-wrap">
+                    <div class="chat-input-row">
+                        <textarea id="chat-input" class="chat-input" rows="1"
+                            placeholder="Ask about Indian law… (e.g. 'What is Article 21?')"></textarea>
+                        <button class="chat-send" id="send-btn" onclick="sendMessage()" aria-label="Send message">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="chat-hint">⚠️ For informational purposes only. Consult a qualified advocate for specific legal advice. Free legal aid: NALSA (nalsa.gov.in)</div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section id="services" class="services">
-        <h2>Our Services</h2>
-        <ul>
-            <li><a href="https://drive.google.com/drive/folders/1RFtrmzI8234BSZVsldkiOJt3evTL0Ynk?usp=drive_link" class="service-button">Corporate Law</a></li>
-            <li><a href="https://drive.google.com/drive/folders/1Am1lGque4cj9ONRrgm7fNl7bok3rEfw8?usp=drive_link" class="service-button">Family Law</a></li>
-            <li><a href="https://drive.google.com/drive/folders/1eHd5eyknINztrHxyElia6L7eeEpsnjdm?usp=drive_link" class="service-button">Criminal Defense</a></li>
-            <li><a href="https://drive.google.com/drive/folders/1xdKNXgjQnhtNSqhf824Ixl9OxzjpAJxh?usp=drive_link" class="service-button">Real Estate Law</a></li>
-            <li><a href="https://drive.google.com/drive/folders/1rFgFk3s4WYO9QJZO6f9CTBglSXzOTax3?usp=drive_link" class="service-button">IPC Section</a></li>
-        </ul>
-    </section>
-    
+    <!-- ══════════════════════════════════════════════════════
+         HOW IT WORKS
+    ══════════════════════════════════════════════════════ -->
+    <div>
+        <div class="section center">
+            <div class="reveal">
+                <div class="section-label">✦ Our Process</div>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-sub">Our NLP pipeline processes your legal query in three intelligent steps.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card reveal reveal-delay-1">
+                    <div class="step-num">1</div>
+                    <h3 class="step-title">Ask Your Question</h3>
+                    <p class="step-desc">Type your legal question in plain English or Hindi. No jargon needed — describe your situation naturally.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-2">
+                    <div class="step-num">2</div>
+                    <h3 class="step-title">NLP Analysis</h3>
+                    <p class="step-desc">Our TF-IDF retrieval engine searches the Indian legal corpus. If a fine-tuned Flan-T5 model is available, it generates a bespoke answer.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-3">
+                    <div class="step-num">3</div>
+                    <h3 class="step-title">Instant Answer</h3>
+                    <p class="step-desc">Receive a clear, cited answer with the relevant legal provision, source, and category — stored securely in SQLite.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <section id="contact" class="contact">
-        <h2>Contact Us</h2>
-        <form>
-            <div class="half">
-                <label for="name">Your Name</label>
-                <input type="text" id="name" name="name" required>
+    <!-- ══════════════════════════════════════════════════════
+         TEAM
+    ══════════════════════════════════════════════════════ -->
+    <div id="team">
+        <div class="section center">
+            <div class="reveal">
+                <div class="section-label">✦ Our Team</div>
+                <h2 class="section-title">Built by Passionate Developers</h2>
+                <p class="section-sub">A 3-member team collaborating across requirement analysis, system design (DFD), model development, and deployment.</p>
             </div>
-            <div class="half">
-                <label for="email">Your Email</label>
-                <input type="email" id="email" name="email" required>
+            <div class="team-grid">
+                <div class="team-card reveal reveal-delay-1">
+                    <div class="team-av">👨‍💻</div>
+                    <div class="team-name">Kunal Kushwaha</div>
+                    <div class="team-role">Project Lead · Backend</div>
+                    <div class="team-bio">System architecture, Flask backend, NLP pipeline, database design, and project coordination.</div>
+                </div>
+                <div class="team-card reveal reveal-delay-2">
+                    <div class="team-av">👨‍🔬</div>
+                    <div class="team-name">Alekh Sachan</div>
+                    <div class="team-role">ML Engineer · Data Pipeline</div>
+                    <div class="team-bio">Model fine-tuning (Flan-T5), data collection, preprocessing pipeline, and legal corpus development.</div>
+                </div>
+                <div class="team-card reveal reveal-delay-3">
+                    <div class="team-av">👩‍🎨</div>
+                    <div class="team-name">Roshni Samanta</div>
+                    <div class="team-role">Frontend · System Design</div>
+                    <div class="team-bio">UI/UX design, system design documentation (DFD), frontend development, and QA testing.</div>
+                </div>
             </div>
-            <div class="full">
-                <label for="message">Your Message</label>
-                <textarea id="message" name="message" rows="6" required></textarea>
-            </div>
-            <div class="full">
-                <button type="submit">Send Message</button>
-            </div>
-        </form>
-    </section>
+        </div>
+    </div>
 
+    <!-- ══════════════════════════════════════════════════════
+         CONTACT
+    ══════════════════════════════════════════════════════ -->
+    <div id="contact">
+        <div class="section">
+            <div class="reveal">
+                <div class="section-label">✦ Contact Us</div>
+                <h2 class="section-title">Get in Touch</h2>
+                <p class="section-sub">Questions, feedback, or collaboration opportunities — we'd love to hear from you.</p>
+            </div>
+            <div class="contact-grid reveal">
+                <!-- Left info -->
+                <div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div>
+                            <div class="contact-lbl">Email</div>
+                            <div class="contact-val">legalcompass@example.com</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div>
+                            <div class="contact-lbl">Location</div>
+                            <div class="contact-val">India</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">⚖️</div>
+                        <div>
+                            <div class="contact-lbl">Legal Notice</div>
+                            <div class="contact-legal">Legal Compass provides informational content only. It is not a substitute for professional legal advice. For serious matters, always consult a qualified advocate. Free legal aid: <strong>NALSA</strong> (nalsa.gov.in).</div>
+                        </div>
+                    </div>
+                    <a href="https://cdn.botpress.cloud/webchat/v2/shareable.html?botId=26a83f89-ace1-4045-92ba-95b836f75669"
+                        target="_blank" class="btn-outline" id="botpress-link"
+                        style="display:inline-flex; margin-top:12px;">
+                        🤖 Try Botpress Chat ↗
+                    </a>
+                </div>
+
+                <!-- Right form -->
+                <div class="contact-form">
+                    <form onsubmit="handleContact(event)" id="contact-form">
+                        <div class="form-2col">
+                            <div class="form-group">
+                                <label class="form-lbl" for="c-name">Your Name</label>
+                                <input type="text" id="c-name" class="form-input" placeholder="John Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-lbl" for="c-email">Email Address</label>
+                                <input type="email" id="c-email" class="form-input" placeholder="you@example.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-lbl" for="c-subject">Subject</label>
+                            <input type="text" id="c-subject" class="form-input" placeholder="Legal question about…">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-lbl" for="c-msg">Message</label>
+                            <textarea id="c-msg" class="form-ta" placeholder="Describe your query or feedback…" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit" id="submit-btn">Send Message →</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         FOOTER
+    ══════════════════════════════════════════════════════ -->
     <footer>
-        <p>&copy; 2024 Legal Compass. All Rights Reserved. | <a href="#contact">Get in Touch</a></p>
-    </footer><script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
-   
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <span class="footer-logo">Legal<span>Compass</span></span>
+                    <p>AI-powered legal assistant for Indian citizens. Making legal knowledge accessible, affordable, and clear — for everyone.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigate</h4>
+                    <a href="#about">About</a>
+                    <a href="#services">Services</a>
+                    <a href="#chat">AI Chat</a>
+                    <a href="#team">Team</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Law Areas</h4>
+                    <a href="#services">Constitutional Law</a>
+                    <a href="#services">Criminal Law (IPC)</a>
+                    <a href="#services">Criminal Procedure</a>
+                    <a href="#services">Property Law</a>
+                    <a href="#services">Consumer Rights</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <a href="https://nalsa.gov.in" target="_blank">NALSA Free Aid</a>
+                    <a href="https://indiankanoon.org" target="_blank">Indian Kanoon</a>
+                    <a href="https://www.mca.gov.in" target="_blank">MCA (Company Law)</a>
+                    <a href="https://consumerhelpline.gov.in" target="_blank">Consumer Helpline</a>
+                    <a href="https://cybercrime.gov.in" target="_blank">Cyber Crime Portal</a>
+                </div>
+            </div>
+            <div class="footer-bot">
+                <div class="footer-copy">© 2024 Legal Compass. All Rights Reserved.</div>
+                <div class="footer-disclaimer">⚠️ Informational purposes only. Not legal advice. Consult a qualified advocate for your specific legal situation.</div>
+            </div>
+        </div>
+    </footer>
 
-  
+    <!-- Botpress Widget (floating, secondary) -->
+    <script src="https://cdn.botpress.cloud/webchat/v2.1/inject.js" defer></script>
+    <script src="https://mediafiles.botpress.cloud/26a83f89-ace1-4045-92ba-95b836f75669/webchat/v2.1/config.js" defer></script>
+
+    <!-- ══════════════════════════════════════════════════════
+         JAVASCRIPT
+    ══════════════════════════════════════════════════════ -->
+    <script>
+    (() => {
+        'use strict';
+
+        /* ── Config ──────────────────────────────────────── */
+        const API = 'http://localhost:5000';
+        const SESSION_KEY = 'lc_session_v2';
+
+        let sessionId = localStorage.getItem(SESSION_KEY) || generateUUID();
+        localStorage.setItem(SESSION_KEY, sessionId);
+        let apiOk = false;
+        let typingShown = false;
+
+        /* ── Utilities ───────────────────────────────────── */
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+
+        function nowTime() {
+            return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escHtml(s) {
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        function renderMd(text) {
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({ breaks: true, gfm: true });
+                return marked.parse(text);
+            }
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g,   '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        /* ── API check ───────────────────────────────────── */
+        async function checkAPI() {
+            try {
+                const res = await fetch(`${API}/api/categories`, {
+                    signal: AbortSignal.timeout(2500)
+                });
+                if (res.ok) {
+                    apiOk = true;
+                    document.getElementById('api-banner').classList.remove('show');
+                    await loadHistory();
+                }
+            } catch {
+                apiOk = false;
+                document.getElementById('api-banner').classList.add('show');
+            }
+        }
+
+        /* ── Load history from server ────────────────────── */
+        async function loadHistory() {
+            if (!apiOk) return;
+            try {
+                const res = await fetch(`${API}/api/history?session_id=${sessionId}`);
+                const hist = await res.json();
+                if (hist.length) {
+                    removeWelcome();
+                    hist.forEach(h => {
+                        appendMsg(h.user, 'user');
+                        appendMsg(h.bot, 'bot', h.category, []);
+                    });
+                }
+            } catch {}
+        }
+
+        /* ── Message rendering ───────────────────────────── */
+        function removeWelcome() {
+            const w = document.getElementById('welcome-msg');
+            if (w) w.remove();
+        }
+
+        const CAT_LABELS = {
+            constitution: '⚖️ Constitutional',
+            ipc:          '🔴 IPC',
+            crpc:         '🔵 CrPC',
+            general:      '📋 General',
+        };
+
+        function appendMsg(text, type, category = null, sources = []) {
+            const msgs = document.getElementById('chat-msgs');
+            const div = document.createElement('div');
+            div.className = `msg ${type}`;
+
+            const bubbleHtml = type === 'bot' ? renderMd(text) : escHtml(text);
+            const avatarEmoji = type === 'bot' ? '⚖️' : '👤';
+
+            let meta = '';
+            if (type === 'bot' && category) {
+                const catCls  = `cat-${category}`;
+                const catName = CAT_LABELS[category] || category;
+                const srcHtml = sources.length
+                    ? `<span class="msg-src">📎 ${escHtml(sources.join(', '))}</span>`
+                    : '';
+                meta = `<div class="msg-meta">
+                    <span class="cat-badge ${catCls}">${catName}</span>
+                    ${srcHtml}
+                    <span class="msg-time">${nowTime()}</span>
+                </div>`;
+            }
+
+            div.innerHTML = `
+                <div class="msg-av">${avatarEmoji}</div>
+                <div class="msg-body">
+                    <div class="msg-bubble">${bubbleHtml}</div>
+                    ${meta}
+                </div>`;
+
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        /* ── Typing indicator ────────────────────────────── */
+        function showTyping() {
+            if (typingShown) return;
+            typingShown = true;
+            const msgs = document.getElementById('chat-msgs');
+            const div = document.createElement('div');
+            div.className = 'typing-wrap';
+            div.id = 'typing-ind';
+            div.innerHTML = `
+                <div class="msg-av" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--gold));display:flex;align-items:center;justify-content:center;flex-shrink:0;">⚖️</div>
+                <div class="typing-bubble">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingShown = false;
+            const t = document.getElementById('typing-ind');
+            if (t) t.remove();
+        }
+
+        /* ── Send message ────────────────────────────────── */
+        window.sendMessage = async function () {
+            const input = document.getElementById('chat-input');
+            const btn   = document.getElementById('send-btn');
+            const text  = input.value.trim();
+            if (!text || btn.disabled) return;
+
+            removeWelcome();
+            appendMsg(text, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            btn.disabled = true;
+            showTyping();
+
+            if (!apiOk) await checkAPI();
+
+            if (apiOk) {
+                try {
+                    const res = await fetch(`${API}/api/chat`, {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({ message: text, session_id: sessionId }),
+                    });
+                    const data = await res.json();
+                    hideTyping();
+                    appendMsg(data.answer, 'bot', data.category, data.sources || []);
+                } catch (err) {
+                    hideTyping();
+                    appendMsg(
+                        '⚠️ Could not reach the Flask server.\n\nPlease start it:\n1. Open a terminal in the project folder\n2. Run: `pip install -r requirements.txt`\n3. Run: `python app.py`\n4. Refresh this page',
+                        'bot', 'general'
+                    );
+                    apiOk = false;
+                    document.getElementById('api-banner').classList.add('show');
+                }
+            } else {
+                setTimeout(() => {
+                    hideTyping();
+                    appendMsg(
+                        '⚠️ **Flask server is offline.**\n\nTo enable AI chat:\n1. Open terminal in the project folder\n2. `pip install -r requirements.txt`\n3. `python app.py`\n4. Refresh this page\n\nAlternatively, use the **Botpress Chat** widget (bottom-right corner).',
+                        'bot', 'general'
+                    );
+                }, 900);
+            }
+
+            btn.disabled = false;
+            input.focus();
+        };
+
+        window.useSuggestion = function (el) {
+            document.getElementById('chat-input').value = el.textContent.trim();
+            sendMessage();
+        };
+
+        /* ── Clear chat ──────────────────────────────────── */
+        window.clearChat = async function () {
+            if (!confirm('Clear all chat history?')) return;
+            const msgs = document.getElementById('chat-msgs');
+            msgs.innerHTML = '';
+            if (apiOk) {
+                await fetch(`${API}/api/clear`, {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ session_id: sessionId }),
+                }).catch(() => {});
+            }
+            appendMsg('Chat cleared. Ready for your next legal question! ⚖️', 'bot', 'general');
+        };
+
+        /* ── Export chat ─────────────────────────────────── */
+        window.exportChat = function () {
+            const msgs = document.querySelectorAll('#chat-msgs .msg');
+            let out = `Legal Compass — Chat Export\n${new Date().toLocaleString('en-IN')}\n${'─'.repeat(50)}\n\n`;
+            msgs.forEach(m => {
+                const isUser = m.classList.contains('user');
+                const bubble = m.querySelector('.msg-bubble');
+                if (bubble) out += `${isUser ? 'YOU' : 'AI'}: ${bubble.innerText}\n\n`;
+            });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([out], { type: 'text/plain' }));
+            a.download = 'legal-compass-chat.txt';
+            a.click();
+        };
+
+        /* ── Auto-resize textarea ────────────────────────── */
+        const chatInput = document.getElementById('chat-input');
+        chatInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        chatInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+
+        /* ── Contact form ────────────────────────────────── */
+        window.handleContact = function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.textContent = '✓ Sent!';
+            btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            setTimeout(() => {
+                btn.textContent = 'Send Message →';
+                btn.style.background = '';
+                e.target.reset();
+            }, 3000);
+        };
+
+        /* ── Scroll reveal ───────────────────────────────── */
+        const revealObs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.08 });
+        document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+        /* ── Navbar shrink on scroll ─────────────────────── */
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', scrollY > 55);
+        }, { passive: true });
+
+        /* ── Init ────────────────────────────────────────── */
+        checkAPI();
+        // Retry API every 12 seconds if offline
+        setInterval(() => { if (!apiOk) checkAPI(); }, 12000);
+
+    })();
+    </script>
 </body>
 </html>

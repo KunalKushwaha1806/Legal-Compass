@@ -1,18 +1,35 @@
-# Model - too large for GitHub
+# Model weights & large binaries (>100MB for GitHub)
+model/*.safetensors
+model/*.bin
+model/*.h5
 model/saved_model/
 
-# Data - regenerable
+# Data & Vector Index
 data/vector_store/
 data/raw/
 data/processed/
 
-# Python
+# Databases & Environment Secrets
+*.db
+*.sqlite
+*.sqlite3
+.env
+backend_node/.env
+frontend/.env
+
+# Node.js & Dependencies
+node_modules/
+backend_node/node_modules/
+frontend/node_modules/
+
+# Python & Build Outputs
 __pycache__/
 *.pyc
-.env
-
-# Node
-node_modules/
-
-# React
+.venv/
+venv/
 frontend/dist/
+frontend/build/
+
+# OS Junk
+.DS_Store
+Thumbs.db
