@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: legal-compass-api
+    runtime: node
+    rootDir: backend_node
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: PYTHON_API_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

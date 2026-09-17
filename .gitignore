@@ -13,6 +13,8 @@ data/processed/
 *.db
 *.sqlite
 *.sqlite3
+legal_compass_node.json
+*.local.json
 .env
 backend_node/.env
 frontend/.env

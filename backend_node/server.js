@@ -32,6 +32,7 @@ const __dirname  = dirname(__filename);
 const PORT         = parseInt(process.env.PORT || '3001', 10);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const NODE_ENV     = process.env.NODE_ENV || 'development';
+const frontendOrigins = FRONTEND_URL.split(',').map((url) => url.trim()).filter(Boolean);
 
 // ── Validate required env vars ────────────────────────────────
 const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
@@ -48,11 +49,11 @@ const app = express();
 // Middleware
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow: React dev, local, Vercel deployments and preview URLs
-        if (!origin || origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1') || origin === FRONTEND_URL) {
+        // Allow the configured production domain, Vercel preview domains, and local development.
+        if (!origin || origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1') || frontendOrigins.includes(origin)) {
             return callback(null, true);
         }
-        return callback(null, true);
+        return callback(new Error(`Origin not allowed by CORS: ${origin}`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
@@ -114,9 +115,16 @@ async function startServer() {
         console.log(`[Config] Python API → ${process.env.PYTHON_API_URL}`);
     }
 
-    // Start listening
-    app.listen(PORT, () => {
-        console.log(`\n[Server] Running at http://localhost:${PORT}`);
+    try {
+        await initDatabase();
+    } catch (err) {
+        console.error('[DB] Failed to initialize schema:', err.message);
+        process.exit(1);
+    }
+
+    // Bind to Render's assigned network interface and port.
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`\n[Server] Running at http://0.0.0.0:${PORT}`);
         console.log(`[Server] Health check: http://localhost:${PORT}/health`);
         console.log(`[Server] Environment: ${NODE_ENV}`);
         console.log('='.repeat(55) + '\n');

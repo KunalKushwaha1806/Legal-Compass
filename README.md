@@ -29,7 +29,7 @@ Built completely from scratch without third-party bot builders. Features a **dec
                                                   ▼
                                   ┌───────────────────────────────┐
                                   │    Node.js Express Backend    │
-                                  │   Port 3001 / Railway Deploy  │
+                                  │    Port 3001 / Render Deploy  │
                                   └───────┬───────────────┬───────┘
                                           │               │
                       PostgreSQL / SQLite │               │  RAG / NLP Proxy
@@ -149,7 +149,7 @@ python test_suite.py
 ## 🚀 Production Deployment (Phase 6)
 
 - **Frontend:** Deploy `frontend/` to **Vercel** or **Netlify** (`npm run build`).
-- **Node Backend:** Deploy `backend_node/` to **Railway** or **Render** (set `DATABASE_URL`, `JWT_SECRET`, `PYTHON_API_URL`).
+- **Node Backend:** Deploy `backend_node/` to **Render** using `render.yaml`. Set `DATABASE_URL`, `FRONTEND_URL`, and, when applicable, `PYTHON_API_URL`. See [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md).
 - **Python RAG Server:** Run on **Hugging Face Spaces (GPU)** or **Google Colab** + `ngrok`.
 
 ---

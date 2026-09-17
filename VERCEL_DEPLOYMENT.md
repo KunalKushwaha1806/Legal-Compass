@@ -22,9 +22,12 @@ This repository is configured to deploy directly to **Vercel** with zero frictio
    - **Output Directory:** `frontend/dist` (if deployed from root) or `dist` (if root directory is `frontend`)
 5. **Environment Variables:**
    Under **Environment Variables**, add:
-   - `VITE_API_URL`: The URL of your deployed Node.js backend (e.g., `https://your-backend.up.railway.app/api`).
+   - `VITE_API_URL`: The URL of your deployed Render API (e.g., `https://legal-compass-api.onrender.com`).
      *(Note: If you are running locally or proxying, it falls back to `/api` automatically).*
 6. Click **Deploy**.
+
+For the Render API setup, environment variables, and end-to-end verification,
+follow [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md).
 
 ---
 
