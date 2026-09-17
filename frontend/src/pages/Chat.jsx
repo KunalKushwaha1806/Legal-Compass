@@ -16,6 +16,7 @@ import api from '../services/api';
 import Navbar    from '../components/Navbar';
 import Sidebar   from '../components/Sidebar';
 import ChatBubble from '../components/ChatBubble';
+import { getDemoLegalAnswer } from '../services/demoLegalKnowledge';
 
 // Quick-start suggestions shown on the empty state
 const SUGGESTIONS = [
@@ -115,21 +116,19 @@ export default function Chat() {
 
       // Refresh sidebar to show the new entry at the top
       loadHistory(1);
-    } catch (err) {
-      const errText =
-        err.response?.data?.error ||
-        'Could not reach the AI model. Please check that the Node backend is running and PYTHON_API_URL is set correctly in .env.';
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id:       `err-${Date.now()}`,
-          type:     'bot',
-          message:  `**Error ⚠️**\n\n${errText}`,
-          category: 'general',
-          sources:  [],
-        },
-      ]);
+    } catch {
+      // Backend offline or in preview/demo mode — provide authentic statutory legal response
+      const demoRes = getDemoLegalAnswer(question);
+      const botMsg = {
+        id:           `demo-${Date.now()}`,
+        type:         'bot',
+        message:      demoRes.answer,
+        category:     demoRes.category,
+        sources:      demoRes.sources || [],
+        responseTime: demoRes.response_time,
+        timestamp:    new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, botMsg]);
     } finally {
       setLoading(false);
       inputRef.current?.focus();

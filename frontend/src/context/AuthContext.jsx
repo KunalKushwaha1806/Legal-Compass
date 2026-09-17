@@ -11,8 +11,17 @@ export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null);
   const [loading, setLoading] = useState(true); // true until we verify the stored token
 
-  // On mount: verify the stored JWT token
+  // On mount: verify the stored JWT token or guest session
   useEffect(() => {
+    const guestUser = localStorage.getItem('lc_guest_user');
+    if (guestUser) {
+      try {
+        setUser(JSON.parse(guestUser));
+      } catch {}
+      setLoading(false);
+      return;
+    }
+
     const token = localStorage.getItem('lc_token');
     if (!token) {
       setLoading(false);
@@ -33,7 +42,15 @@ export function AuthProvider({ children }) {
   /** POST /api/auth/login — returns user object */
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    const { token, user: newUser } = res.data;
+    const { token, user: newUser } = res.data || {};
+    if (!token || !newUser) {
+      throw new Error(
+        typeof res.data === 'string' && res.data.includes('<!doctype html>')
+          ? 'Backend API not reachable (HTML returned). Check VITE_API_URL in Vercel settings.'
+          : 'Invalid response from backend server.'
+      );
+    }
+    localStorage.removeItem('lc_guest_user');
     localStorage.setItem('lc_token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setUser(newUser);
@@ -43,22 +60,41 @@ export function AuthProvider({ children }) {
   /** POST /api/auth/register — returns user object */
   const register = async (name, email, password) => {
     const res = await api.post('/auth/register', { name, email, password });
-    const { token, user: newUser } = res.data;
+    const { token, user: newUser } = res.data || {};
+    if (!token || !newUser) {
+      throw new Error(
+        typeof res.data === 'string' && res.data.includes('<!doctype html>')
+          ? 'Backend API not reachable (HTML returned). Check VITE_API_URL in Vercel settings.'
+          : 'Invalid response from backend server.'
+      );
+    }
+    localStorage.removeItem('lc_guest_user');
     localStorage.setItem('lc_token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setUser(newUser);
     return newUser;
   };
 
+  /** Instant Guest / Demo Mode (no backend connection required) */
+  const continueAsGuest = () => {
+    const guest = { id: 'guest', name: 'Guest Explorer', email: 'guest@legalcompass.local', isGuest: true };
+    localStorage.setItem('lc_guest_user', JSON.stringify(guest));
+    localStorage.removeItem('lc_token');
+    delete api.defaults.headers.common['Authorization'];
+    setUser(guest);
+    return guest;
+  };
+
   /** Clear token and user */
   const logout = () => {
     localStorage.removeItem('lc_token');
+    localStorage.removeItem('lc_guest_user');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, continueAsGuest, logout }}>
       {children}
     </AuthContext.Provider>
   );

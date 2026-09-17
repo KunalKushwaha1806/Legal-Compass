@@ -5,8 +5,16 @@
  */
 import axios from 'axios';
 
+const rawApiUrl = import.meta.env.VITE_API_URL;
+let resolvedBaseUrl = '/api';
+
+if (rawApiUrl) {
+  const trimmed = rawApiUrl.trim().replace(/\/$/, '');
+  resolvedBaseUrl = trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+}
+
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, ''),
+  baseURL: resolvedBaseUrl,
   timeout: 90_000, // 90s — fine-tuned model on Colab can be slow
   headers: { 'Content-Type': 'application/json' },
 });

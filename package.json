@@ -5,7 +5,9 @@
   "description": "Legal Compass — AI-Powered Indian Law Assistant",
   "scripts": {
     "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "start": "npm --prefix backend_node start"
+    "start": "npm --prefix backend_node start",
+    "backend": "npm --prefix backend_node start",
+    "frontend": "npm --prefix frontend run dev"
   },
   "keywords": [
     "legal",

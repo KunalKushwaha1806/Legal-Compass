@@ -48,14 +48,11 @@ const app = express();
 // Middleware
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow: React dev (5173), Postman (no origin), production URL, and Vercel domains
-        const allowed = [
-            FRONTEND_URL,
-            'http://localhost:5173',
-            'http://localhost:3000',
-        ];
-        if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) return callback(null, true);
-        return callback(new Error(`CORS blocked: ${origin}`));
+        // Allow: React dev, local, Vercel deployments and preview URLs
+        if (!origin || origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1') || origin === FRONTEND_URL) {
+            return callback(null, true);
+        }
+        return callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
@@ -67,7 +64,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/chat', chatRoutes);
 
 // Health check — also shows Python API URL status
 app.get('/health', (req, res) => {

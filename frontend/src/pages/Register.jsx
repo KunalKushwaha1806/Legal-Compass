@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
-  const { register } = useAuth();
+  const { register, continueAsGuest } = useAuth();
   const navigate     = useNavigate();
 
   const [form, setForm] = useState({
@@ -48,10 +48,15 @@ export default function Register() {
       await register(name.trim(), email.trim(), password);
       navigate('/', { replace: true });
     } catch (err) {
-      setError(
-        err.response?.data?.error ||
-        'Registration failed. Please try again.'
-      );
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (!err.response) {
+        setError('Cannot reach backend server. Make sure the Node backend is running locally, or click "Explore in Demo Mode" below.');
+      } else if (err.response.status === 404 || err.response.status === 405 || typeof err.response.data === 'string') {
+        setError('Backend API not found on this domain. If hosting on Vercel, set VITE_API_URL to your deployed backend, or use Demo Mode below.');
+      } else {
+        setError(err.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -150,6 +155,19 @@ export default function Register() {
               ) : (
                 'Create Account →'
               )}
+            </button>
+
+            <div className="auth-divider">or explore right now</div>
+
+            <button
+              type="button"
+              className="btn-demo"
+              onClick={() => {
+                continueAsGuest();
+                navigate('/', { replace: true });
+              }}
+            >
+              ⚡ Explore in Demo / Guest Mode
             </button>
           </form>
 

@@ -30,6 +30,20 @@ export default function Navbar({ apiOnline = false }) {
         {user && (
           <div className="navbar-user">
             Hey, <strong>{user.name.split(' ')[0]}</strong>
+            {user.isGuest && (
+              <span style={{
+                fontSize: '0.72rem',
+                background: 'rgba(245,158,11,0.16)',
+                color: 'var(--gold-light)',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                marginLeft: '8px',
+                border: '1px solid rgba(245,158,11,0.3)',
+                fontWeight: 600
+              }}>
+                Demo Mode
+              </span>
+            )}
           </div>
         )}
         <button className="btn-logout" onClick={handleLogout}>
