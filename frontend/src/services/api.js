@@ -26,13 +26,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle token expiry globally — redirect to login
+// Handle token expiry globally — redirect to login (only for authenticated users with a token, never in guest/demo mode)
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('lc_token');
-      window.location.href = '/login';
+      const isGuest = !!localStorage.getItem('lc_guest_user');
+      if (!isGuest) {
+        localStorage.removeItem('lc_token');
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          window.location.href = '/login';
+        }
+      }
     }
     return Promise.reject(err);
   }

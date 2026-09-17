@@ -13,6 +13,7 @@
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import Navbar    from '../components/Navbar';
 import Sidebar   from '../components/Sidebar';
 import ChatBubble from '../components/ChatBubble';
@@ -37,6 +38,9 @@ const WELCOME = {
 };
 
 export default function Chat() {
+  const { user } = useAuth();
+  const isGuest = Boolean(user?.isGuest);
+
   const [messages,    setMessages]    = useState([WELCOME]);
   const [history,     setHistory]     = useState([]);
   const [input,       setInput]       = useState('');
@@ -58,6 +62,22 @@ export default function Chat() {
 
   // ── Load sidebar history ─────────────────────────────────────
   const loadHistory = useCallback(async (page = 1, append = false) => {
+    if (isGuest) {
+      setHistLoading(true);
+      try {
+        const stored = localStorage.getItem('lc_guest_history');
+        const guestChats = stored ? JSON.parse(stored) : [];
+        setHistory(guestChats);
+        setHistHasMore(false);
+        setHistPage(1);
+      } catch {
+        setHistory([]);
+      } finally {
+        setHistLoading(false);
+      }
+      return;
+    }
+
     setHistLoading(true);
     try {
       const res = await api.get(`/chat/history?page=${page}&limit=20`);
@@ -71,7 +91,7 @@ export default function Chat() {
     } finally {
       setHistLoading(false);
     }
-  }, []);
+  }, [isGuest]);
 
   useEffect(() => { loadHistory(1); }, [loadHistory]);
 
@@ -96,6 +116,43 @@ export default function Chat() {
     setInput('');
     if (inputRef.current) inputRef.current.style.height = 'auto';
     setLoading(true);
+
+    if (isGuest) {
+      // Demo / Guest mode: instant authentic response with slight delay for natural feel
+      setTimeout(() => {
+        const demoRes = getDemoLegalAnswer(question);
+        const botMsg = {
+          id:           `demo-${Date.now()}`,
+          type:         'bot',
+          message:      demoRes.answer,
+          category:     demoRes.category,
+          sources:      demoRes.sources || [],
+          responseTime: demoRes.response_time,
+          timestamp:    new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, botMsg]);
+        setLoading(false);
+
+        const historyItem = {
+          id:           Date.now(),
+          question,
+          answer:       demoRes.answer,
+          category:     demoRes.category,
+          sources:      demoRes.sources || [],
+          response_time: demoRes.response_time,
+          created_at:   new Date().toISOString(),
+        };
+        setHistory((prev) => {
+          const updated = [historyItem, ...prev];
+          try {
+            localStorage.setItem('lc_guest_history', JSON.stringify(updated.slice(0, 50)));
+          } catch {}
+          return updated;
+        });
+        inputRef.current?.focus();
+      }, 400);
+      return;
+    }
 
     try {
       const res = await api.post('/chat', { question });

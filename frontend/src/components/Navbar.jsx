@@ -19,9 +19,14 @@ export default function Navbar({ apiOnline = false }) {
       {/* Left: logo + status */}
       <div className="navbar-left">
         <div className="navbar-title">⚖️ Legal<span style={{ color: 'var(--gold)' }}>Compass</span></div>
-        <div className="navbar-status">
-          <span className="status-dot" />
-          {apiOnline ? 'AI Model Online' : 'AI Model Connecting…'}
+        <div className="navbar-status" style={user?.isGuest ? { color: 'var(--gold-light)' } : undefined}>
+          <span
+            className="status-dot"
+            style={user?.isGuest ? { background: 'var(--gold)' } : undefined}
+          />
+          {user?.isGuest
+            ? 'Demo Knowledge Base Active'
+            : (apiOnline ? 'AI Model Online' : 'AI Model Connecting…')}
         </div>
       </div>
 

@@ -8,16 +8,27 @@ import api from '../services/api';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user,    setUser]    = useState(null);
-  const [loading, setLoading] = useState(true); // true until we verify the stored token
-
-  // On mount: verify the stored JWT token or guest session
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const guestUser = localStorage.getItem('lc_guest_user');
     if (guestUser) {
       try {
-        setUser(JSON.parse(guestUser));
+        return JSON.parse(guestUser);
       } catch {}
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    // Guest mode needs no token validation
+    if (localStorage.getItem('lc_guest_user')) return false;
+    // No token stored means unauthenticated
+    if (!localStorage.getItem('lc_token')) return false;
+    return true; // Verify existing token
+  });
+
+  // On mount: verify the stored JWT token if one exists (and not in guest mode)
+  useEffect(() => {
+    if (localStorage.getItem('lc_guest_user')) {
       setLoading(false);
       return;
     }
@@ -35,6 +46,7 @@ export function AuthProvider({ children }) {
         // Token invalid or expired
         localStorage.removeItem('lc_token');
         delete api.defaults.headers.common['Authorization'];
+        setUser(null);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -89,6 +101,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('lc_token');
     localStorage.removeItem('lc_guest_user');
+    localStorage.removeItem('lc_guest_history');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
