@@ -12,7 +12,7 @@ Endpoints:
   GET  /api/categories    → KB category counts
 """
 import os
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 
 from database import init_db, save_conversation, get_history, clear_history, get_stats
@@ -38,8 +38,8 @@ print("=" * 55 + "\n")
 # ── Routes ─────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    """Serve the main frontend HTML."""
-    return send_from_directory(".", "maincode.html")
+    """Redirect to the Vite frontend (port 5173)."""
+    return redirect("http://localhost:5173", code=302)
 
 
 @app.route("/api/chat", methods=["POST"])

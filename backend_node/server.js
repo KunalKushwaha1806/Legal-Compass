@@ -48,13 +48,13 @@ const app = express();
 // Middleware
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow: React dev (5173), Postman (no origin), production URL
+        // Allow: React dev (5173), Postman (no origin), production URL, and Vercel domains
         const allowed = [
             FRONTEND_URL,
             'http://localhost:5173',
             'http://localhost:3000',
         ];
-        if (!origin || allowed.includes(origin)) return callback(null, true);
+        if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) return callback(null, true);
         return callback(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,

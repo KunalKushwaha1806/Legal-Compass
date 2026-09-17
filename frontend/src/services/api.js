@@ -6,7 +6,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, ''),
   timeout: 90_000, // 90s — fine-tuned model on Colab can be slow
   headers: { 'Content-Type': 'application/json' },
 });

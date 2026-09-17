@@ -1,0 +1,20 @@
+{
+  "name": "legal-compass",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Legal Compass — AI-Powered Indian Law Assistant",
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "start": "npm --prefix backend_node start"
+  },
+  "keywords": [
+    "legal",
+    "ai",
+    "indian-law",
+    "nlp",
+    "vite",
+    "react"
+  ],
+  "author": "Kunal Kushwaha",
+  "license": "MIT"
+}
