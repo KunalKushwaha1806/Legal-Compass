@@ -49,7 +49,7 @@ def chat():
     Body: { "message": str, "session_id": str (optional) }
     """
     data = request.get_json(force=True, silent=True) or {}
-    message = (data.get("message") or "").strip()
+    message = (data.get("message") or data.get("question") or "").strip()
     session_id = (data.get("session_id") or "default").strip()
 
     if not message:
