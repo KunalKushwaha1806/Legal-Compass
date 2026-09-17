@@ -2,6 +2,7 @@ services:
   - type: web
     name: legal-compass-api
     runtime: node
+    plan: free
     rootDir: backend_node
     buildCommand: npm ci
     startCommand: npm start

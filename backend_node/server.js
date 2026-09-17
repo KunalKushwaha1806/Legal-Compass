@@ -69,6 +69,15 @@ app.use('/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/chat', chatRoutes);
 
+// Root route — welcome and service info
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Legal Compass API is running.',
+        status: 'ok',
+        health: '/health',
+    });
+});
+
 // Health check — also shows Python API URL status
 app.get('/health', (req, res) => {
     res.json({
